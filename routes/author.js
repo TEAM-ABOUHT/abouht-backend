@@ -4,11 +4,11 @@ var router = express.Router();
 
 const { AuthorModel } = require("../models/author_model");
 
-// controller로 분리하지 않고 route에서 바로 구현
 router.get("/", (req, res) => {
-  	res.status(200).send({message : "사용자 인증 로직"});
+  	res.status(200).send({message : "작가 사용자 관련 로직"});
 });
 
+// 회원가입을 위한 요청 처리
 router.post('/signup', async (req, res) => {
 	try {
 		const authorModel = new AuthorModel(req.body);
@@ -21,17 +21,18 @@ router.post('/signup', async (req, res) => {
 		res.status(200).json({success: true});
 		console.log(stat);
 	}catch (err) {
-		res.status(500).send(err);
+		res.status(500).json({success: false, err});
 		console.log(err);
 	}
 });
 
+// 로그인을 위한 요청 처리, _id로 생성된 token 발급
 router.get('/login', async (req, res) => {
 	try{
-		const author = await AuthorModel.findOne({ email: req.query.email })
-		
-		if(author){
-			  author
+		const authorModel = await AuthorModel.findOne({ email: req.query.email })
+		console.log(req.query.email + " " + req.query.password)
+		if(authorModel){
+			  authorModel
 				.comparePassword(req.query.password)
 				.then((isMatch) => {
 				  if (!isMatch) {
@@ -40,24 +41,61 @@ router.get('/login', async (req, res) => {
 					  message: "Invalid Password",
 					});
 				  }
-				  author
+				  authorModel
 					.generateToken()
-					.then((author) => {
+					.then((authorModel) => {
 					  res
 						.status(200)
-						.json({ loginSuccess: true, authorToken : author.token }); // userId: user._id
+						.json({ sucess: true, authorToken : authorModel.token }); // userId: user._id
 					})
 					.catch((err) => {
-					  res.status(400).send({loginSuccess: false, err});
+					  res.status(400).send({sucess: false, err});
 					});
 				})
-				.catch((err) => res.json({ loginSuccess: false, err }));
+				.catch((err) => res.json({ sucess: false, err }));
 			}else {
-			  res.status(400).send({loginSuccess: false, message: "No Such Author"});
+			  res.status(400).send({sucess: false, message: "No Such Author"});
 			}
 	}catch (err){
-		return res.json({
-			loginSuccess: false,
+		return res.status(500).json({
+			sucess: false,
+			message: err,
+		});
+	 }
+});
+
+// 계정 정보 수정을 위한 요청 처리, replace로 document replace
+router.put('/modify', async (req, res) => {
+	try{
+		const token = req.body.token;
+		const authorModel = new AuthorModel(req.body);
+		console.log(authorModel);
+		const authorID = await AuthorModel.getIdByToken(token);
+		
+		if(authorModel){
+			authorModel
+				.comparePassword(req.query.password)
+				.then(async (isMatch) => {
+					if (!isMatch) {
+						return res.status(401).json({
+						loginSuccess: false,
+						message: "Invalid Password",
+						});
+					}
+					
+					const status = await AuthorModel.replaceOne(
+						{_id : authorID},
+						{ authorModel }
+					);
+					return res.status(200).send({sucess: true, status});
+				})
+				.catch((err) => res.json({ sucess: false, err }));
+			}else {
+			  res.status(400).send({sucess: false, message: "No Such Author"});
+			}
+	}catch (err){
+		return res.status(500).json({
+			sucess: false,
 			message: err,
 		});
 	 }

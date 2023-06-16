@@ -30,7 +30,7 @@ const authorSchema = mongoose.Schema({
 		required: true
 	},
 	gender: {				// 작가 성별
-		type: String,		// 0-남자, 1-여자, 2-특정할 수 없음
+		type: Number,		// 0-남자, 1-여자, 2-특정할 수 없음
 		required: true
 	},
 	penName: {				// 작가의 필명, unique
