@@ -11,8 +11,8 @@ router.get("/", (req, res) => {
 // 회원가입을 위한 요청 처리
 router.post('/signup', async (req, res) => {
 	try {
-		const authorModel = new AuthorModel(req.body);
-		const stat = await authorModel.save();
+		const author = new AuthorModel(req.body);
+		const stat = await author.save();
 
 		if (!stat){
 			const err = new Error("Internal Server Error");
@@ -29,10 +29,10 @@ router.post('/signup', async (req, res) => {
 // 로그인을 위한 요청 처리, _id로 생성된 token 발급
 router.get('/login', async (req, res) => {
 	try{
-		const authorModel = await AuthorModel.findOne({ email: req.query.email })
+		const author = await AuthorModel.findOne({ email: req.query.email })
 		console.log(req.query.email + " " + req.query.password)
-		if(authorModel){
-			  authorModel
+		if(author){
+			  author
 				.comparePassword(req.query.password)
 				.then((isMatch) => {
 				  if (!isMatch) {
@@ -41,12 +41,12 @@ router.get('/login', async (req, res) => {
 					  message: "Invalid Password",
 					});
 				  }
-				  authorModel
+				  author
 					.generateToken()
-					.then((authorModel) => {
+					.then((author) => {
 					  res
 						.status(200)
-						.json({ sucess: true, authorToken : authorModel.token }); // userId: user._id
+						.json({ sucess: true, authorToken : author.token }); // userId: user._id
 					})
 					.catch((err) => {
 					  res.status(400).send({sucess: false, err});
@@ -68,31 +68,19 @@ router.get('/login', async (req, res) => {
 router.put('/modify', async (req, res) => {
 	try{
 		const token = req.body.token;
-		const authorModel = new AuthorModel(req.body);
-		console.log(authorModel);
 		const authorID = await AuthorModel.getIdByToken(token);
+		const baseAuthor = await AuthorModel.findOne({ _id: authorID });
 		
-		if(authorModel){
-			authorModel
-				.comparePassword(req.query.password)
-				.then(async (isMatch) => {
-					if (!isMatch) {
-						return res.status(401).json({
-						loginSuccess: false,
-						message: "Invalid Password",
-						});
-					}
-					
-					const status = await AuthorModel.replaceOne(
-						{_id : authorID},
-						{ authorModel }
-					);
-					return res.status(200).send({sucess: true, status});
-				})
-				.catch((err) => res.json({ sucess: false, err }));
-			}else {
-			  res.status(400).send({sucess: false, message: "No Such Author"});
-			}
+		if(baseAuthor){
+				const status = await AuthorModel.replaceOne(
+					{_id : authorID},
+					req.body
+				);
+			
+				return res.status(200).send({sucess: true, status});
+		}else {
+			res.status(400).send({sucess: false, message: "No Such Author"});
+		}
 	}catch (err){
 		return res.status(500).json({
 			sucess: false,
