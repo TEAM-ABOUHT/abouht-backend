@@ -10,6 +10,7 @@ require('dotenv').config();
 
 var indexRouter = require('./routes/index');
 var authorRouter = require('./routes/author');
+var writingRouter = require('./routes/writing');
 
 var app = express();
 
@@ -27,6 +28,7 @@ app.use(cors({
 
 app.use('/', indexRouter);
 app.use('/author', authorRouter);
+app.use('/writing', writingRouter);
 
 app.use(function(req, res, next) {
   var err = new Error('Not Found');

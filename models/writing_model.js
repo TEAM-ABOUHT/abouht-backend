@@ -4,6 +4,7 @@ const saltRounds = 10;
 const jwt = require("jsonwebtoken");
 
 // 개별 글을 구성하는 스키마
+// 사용자 계정 이외의 데이터들은 _id로 관리
 const writingSchema = mongoose.Schema({
 	title: {				// 글 제목
 		type: String,
@@ -14,11 +15,11 @@ const writingSchema = mongoose.Schema({
 		type: String,
 		required: true
 	},
-	CreateDate: {			// 생성 날짜
+	createDate: {			// 생성 날짜
 		type: Date,
 		default: Date.now,
 	},
-	UpdateDate: {			// 마지막 업데이트 날짜
+	updateDate: {			// 마지막 업데이트 날짜
 		type: Date,
 		default: Date.now,
 	},
@@ -27,25 +28,6 @@ const writingSchema = mongoose.Schema({
 		required: true
 	},
 });
-
-writingSchema.methods.generateToken = function () {
-	const token = jwt.sign(this._id.toHexString(), "secretToken");
-	this.token = token;
-	
-  return this.save()
-    .then((user) => user)
-    .catch((err) => err);
-};
-
-writingSchema.statics.getIdByToken = async (token) => {
-  return jwt.verify(token, "secretToken", function (err, decoded) {
-	  try{
-		  return decoded;
-	  }catch(err){
-		  return err;
-	  }
-  }
-)};
 
 const WritingModel = mongoose.model("WritingModel", writingSchema);
 

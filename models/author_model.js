@@ -48,6 +48,10 @@ const authorSchema = mongoose.Schema({
 		maxLength: 2000,
 		required: true
 	},
+	writings: {				// 작가의 글 _id array
+		type : Array,
+		default : [],
+	}
 });
 
 //save 메소드가 실행되기전에 비밀번호를 암호화
