@@ -8,6 +8,25 @@ router.get("/", (req, res) => {
   	res.status(200).send({message : "작가 사용자 관련 로직"});
 });
 
+// 작가 정보를 token으로 가져오는 요청 처리
+router.get('/getAuthor', async (req, res) => {
+	try{
+		const authorID = await AuthorModel.getIdByToken(req.query.token);
+		// lean을 통해 객체를 document 형태가 아닌 일반 js object로 변환
+		const author = await AuthorModel.findOne({ _id: authorID }).lean();
+		
+		author._id = undefined;
+		author.password = undefined;
+		return res.status(200).send({author});
+	}catch (err){
+		console.log(err);
+		return res.status(500).json({
+			sucess: false,
+			message: err,
+		});
+	 }
+});
+
 // 회원가입을 위한 요청 처리
 router.post('/signup', async (req, res) => {
 	try {
