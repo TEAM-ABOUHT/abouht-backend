@@ -36,4 +36,23 @@ router.post('/addWriting', async (req, res) => {
 	await session.endSession();
 });
 
+// 글 수정
+router.put('/modifyWriting', async (req, res) => {
+	try {
+		await WritingModel.findOneAndUpdate(
+			{ _id : req.body.writingID },
+			{
+				title : req.body.title,
+				content : req.body.content,
+				updateDate: Date.now(),
+			}
+		);
+		
+		res.status(200).json({success: true});
+	}catch (err) {
+		res.status(500).json({success: false, err});
+		console.log(err);
+	}
+});
+
 module.exports = router;

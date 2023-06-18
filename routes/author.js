@@ -8,7 +8,7 @@ router.get("/", (req, res) => {
   	res.status(200).send({message : "작가 사용자 관련 로직"});
 });
 
-// 작가 정보를 token으로 가져오는 요청 처리
+// 작가 정보를 token으로 가져오는 요청 처리 (_id, password는 노출되지 않음)
 router.get('/getAuthor', async (req, res) => {
 	try{
 		const authorID = await AuthorModel.getIdByToken(req.query.token);
