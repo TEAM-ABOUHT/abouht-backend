@@ -55,4 +55,29 @@ router.put('/modifyWriting', async (req, res) => {
 	}
 });
 
+// 글 삭제
+router.delete('/deleteWriting', async (req, res) => {
+	const session = await mongoose.startSession();
+	await session.startTransaction();
+	try {
+		const writing = await WritingModel.findOne({ _id : req.body.writingID });
+		const authorID = await AuthorModel.getIdByToken(writing.authorToken);
+		
+		await AuthorModel.findOneAndUpdate(
+			{ _id : authorID },
+			{ $pull : { writings : writing._id } },
+			{ session: session }
+		);
+		await WritingModel.deleteOne({ _id : req.body.writingID }, { session });
+		
+		await session.commitTransaction();
+		res.status(200).json({success: true});
+	}catch (err) {
+		await session.abortTransaction();
+		res.status(500).json({success: false, err});
+		console.log(err);
+	}
+	await session.endSession();
+});
+
 module.exports = router;
