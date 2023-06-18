@@ -32,7 +32,6 @@ router.get('/getAuthorWritings', async (req, res) => {
 		const author = await AuthorModel.findOne({ _id: authorID }).lean();
 		const writingIDs = author.writings;
 		
-		
 		var writings = [];
 		for(var i = 0;i < writingIDs.length;i++)
 			writings.push(await WritingModel.findOne({ _id: writingIDs[i] }).lean());

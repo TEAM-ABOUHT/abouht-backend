@@ -51,6 +51,10 @@ const authorSchema = mongoose.Schema({
 	writings: {				// 작가의 글 _id array
 		type : Array,
 		default : [],
+	},
+	compilations: {			// 작가의 모음집 _id array
+		type : Array,
+		default : [],
 	}
 });
 
