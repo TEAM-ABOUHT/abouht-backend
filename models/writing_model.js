@@ -23,6 +23,9 @@ const writingSchema = mongoose.Schema({
 		type: Date,
 		default: Date.now,
 	},
+	compilationID: {		// 모음집 아이디
+		type: String,
+	},
 	authorToken: {			// 작가 토큰
 		type: String,
 		required: true
