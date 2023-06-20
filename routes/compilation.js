@@ -59,36 +59,62 @@ router.post('/addCompilation', async (req, res) => {
 
 // 모음집에 글 추가
 router.put('/addWriting', async (req, res) => {
+	const session = await mongoose.startSession();
+	await session.startTransaction();
 	try {
+		const writingID = req.body.writingID;
 		const compilationID = req.body.compilationID;
-				
-		const stat = await CompilationModel.findOneAndUpdate(
-			{ _id : compilationID },
-			{ $push: { writings : req.body.writingID } },
+		
+		await WritingModel.findOneAndUpdate(
+			{ _id : writingID },
+			{ $set: { compilationID : compilationID } },
+			{ session : session }
 		);
-			
+		
+		await CompilationModel.findOneAndUpdate(
+			{ _id : compilationID },
+			{ $push: { writings : writingID } },
+			{ session : session }
+		);
+		
+		await session.commitTransaction();
 		res.status(200).json({success: true});
 	}catch (err) {
+		await session.abortTransaction();
 		res.status(500).json({success: false, err});
 		console.log(err);
 	}
+	await session.endSession();
 });
 
 // 모음집에서 글 삭제
 router.delete('/deleteWriting', async (req, res) => {
+	const session = await mongoose.startSession();
+	await session.startTransaction();
 	try {
+		const writingID = req.body.writingID;
 		const compilationID = req.body.compilationID;
 
-		const stat = await CompilationModel.findOneAndUpdate(
+		await WritingModel.findOneAndUpdate(
+			{ _id : writingID },
+			{ $set: { compilationID : "" } },
+			{ session : session }
+		);
+		
+		await CompilationModel.findOneAndUpdate(
 			{ _id : compilationID },
 			{ $pull: { writings : req.body.writingID } },
+			{ session : session }
 		);
 
+		await session.commitTransaction();
 		res.status(200).json({success: true});
 	}catch (err) {
+		await session.abortTransaction();
 		res.status(500).json({success: false, err});
 		console.log(err);
 	}
+	await session.endSession();
 });
 
 
@@ -97,20 +123,32 @@ router.delete('/deleteCompilation', async (req, res) => {
 	const session = await mongoose.startSession();
 	await session.startTransaction();
 	try {
-		const authorID = await AuthorModel.getIdByToken(req.query.authorToken);
+		const compilation = await CompilationModel.findOne({ _id: req.body.compilationID }).lean();
+		const authorID = await AuthorModel.getIdByToken(req.body.authorToken);
+		console.log(compilation);
+		const writingIDs = compilation.writings;
 		
 		const stat = await AuthorModel.findOneAndUpdate(
 			{ _id : authorID },
 			{ $pull : { compilations : req.body.compilationID } },
 			{ session: session }
 		);
+		
+		for(var i = 0;i < writingIDs.length;i++){
+			await WritingModel.findOneAndUpdate(
+				{ _id : writingIDs[i] },
+				{ $set: { compilationID : "" } },
+				{ session : session }
+			);
+		}
+		
 		await CompilationModel.deleteOne({ _id : req.body.compilationID }, { session });
 		
 		await session.commitTransaction();
 		res.status(200).json({success: true});
 	}catch (err) {
 		await session.abortTransaction();
-		res.status(500).json({success: false, err});
+		res.status(500).json({success: false, message : m}); // 에러 메세지 안나오는거 고치기
 		console.log(err);
 	}
 	await session.endSession();
