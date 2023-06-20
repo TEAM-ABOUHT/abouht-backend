@@ -19,10 +19,9 @@ router.get('/getAuthor', async (req, res) => {
 		author.password = undefined;
 		return res.status(200).send({author});
 	}catch (err){
-		console.log(err);
 		return res.status(500).json({
 			sucess: false,
-			message: err,
+			message : err.message
 		});
 	 }
 });
@@ -35,13 +34,11 @@ router.post('/signup', async (req, res) => {
 
 		if (!stat){
 			const err = new Error("Internal Server Error");
-			res.status(400).json({success: false, err});
+			res.status(400).json({success: false, message : err});
 		}
 		res.status(200).json({success: true});
-		console.log(stat);
 	}catch (err) {
-		res.status(500).json({success: false, err});
-		console.log(err);
+		res.status(500).json({success: false, message : err.message});
 	}
 });
 
@@ -57,7 +54,7 @@ router.get('/login', async (req, res) => {
 				  if (!isMatch) {
 					return res.json({
 					  loginSuccess: false,
-					  message: "Invalid Password",
+					  err: "Invalid Password",
 					});
 				  }
 				  author
@@ -68,17 +65,17 @@ router.get('/login', async (req, res) => {
 						.json({ sucess: true, authorToken : author.token }); // userId: user._id
 					})
 					.catch((err) => {
-					  res.status(400).send({sucess: false, err});
+					  res.status(400).send({sucess: false, message : err.message});
 					});
 				})
-				.catch((err) => res.json({ sucess: false, err }));
+				.catch((err) => res.json({ sucess: false, message : err.message }));
 			}else {
-			  res.status(400).send({sucess: false, message: "No Such Author"});
+			  res.status(400).send({sucess: false, err: "No Such Author"});
 			}
 	}catch (err){
 		return res.status(500).json({
 			sucess: false,
-			message: err,
+			message : err.message
 		});
 	 }
 });
@@ -103,7 +100,7 @@ router.put('/modify', async (req, res) => {
 	}catch (err){
 		return res.status(500).json({
 			sucess: false,
-			message: err,
+			message : err.message,
 		});
 	 }
 });

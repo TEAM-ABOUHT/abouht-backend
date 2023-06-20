@@ -24,10 +24,9 @@ router.get('/getCompilation', async (req, res) => {
 		compilation.writings = writings;
 		return res.status(200).send({compilation});
 	}catch (err){
-		console.log(err);
 		return res.status(500).json({
 			sucess: false,
-			message: err,
+			message : err.message
 		});
 	 }
 });
@@ -51,8 +50,7 @@ router.post('/addCompilation', async (req, res) => {
 		res.status(200).json({success: true});
 	}catch (err) {
 		await session.abortTransaction();
-		res.status(500).json({success: false, err});
-		console.log(err);
+		res.status(500).json({success: false, message : err.message});
 	}
 	await session.endSession();
 });
@@ -81,8 +79,7 @@ router.put('/addWriting', async (req, res) => {
 		res.status(200).json({success: true});
 	}catch (err) {
 		await session.abortTransaction();
-		res.status(500).json({success: false, err});
-		console.log(err);
+		res.status(500).json({success: false, message : err.message});
 	}
 	await session.endSession();
 });
@@ -111,8 +108,7 @@ router.delete('/deleteWriting', async (req, res) => {
 		res.status(200).json({success: true});
 	}catch (err) {
 		await session.abortTransaction();
-		res.status(500).json({success: false, err});
-		console.log(err);
+		res.status(500).json({success: false, message : err.message});
 	}
 	await session.endSession();
 });
@@ -125,10 +121,9 @@ router.delete('/deleteCompilation', async (req, res) => {
 	try {
 		const compilation = await CompilationModel.findOne({ _id: req.body.compilationID }).lean();
 		const authorID = await AuthorModel.getIdByToken(req.body.authorToken);
-		console.log(compilation);
 		const writingIDs = compilation.writings;
 		
-		const stat = await AuthorModel.findOneAndUpdate(
+		await AuthorModel.findOneAndUpdate(
 			{ _id : authorID },
 			{ $pull : { compilations : req.body.compilationID } },
 			{ session: session }
@@ -148,8 +143,7 @@ router.delete('/deleteCompilation', async (req, res) => {
 		res.status(200).json({success: true});
 	}catch (err) {
 		await session.abortTransaction();
-		res.status(500).json({success: false, message : m}); // 에러 메세지 안나오는거 고치기
-		console.log(err);
+		res.status(500).json({success: false, message : err.message});
 	}
 	await session.endSession();
 });

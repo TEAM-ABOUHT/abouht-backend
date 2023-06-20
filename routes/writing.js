@@ -16,10 +16,9 @@ router.get('/getWriting', async (req, res) => {
 		const writing = await WritingModel.findOne({ _id: req.query.writingID }).lean();
 		return res.status(200).send({writing});
 	}catch (err){
-		console.log(err);
 		return res.status(500).json({
 			sucess: false,
-			message: err,
+			message : err.message
 		});
 	 }
 });
@@ -38,10 +37,9 @@ router.get('/getAuthorWritings', async (req, res) => {
 		
 		return res.status(200).send({writings});
 	}catch (err){
-		console.log(err);
 		return res.status(500).json({
 			sucess: false,
-			message: err,
+			message : err.message
 		});
 	 }
 });
@@ -66,8 +64,7 @@ router.post('/addWriting', async (req, res) => {
 		res.status(200).json({success: true});
 	}catch (err) {
 		await session.abortTransaction();
-		res.status(500).json({success: false, err});
-		console.log(err);
+		res.status(500).json({success: false, message : err.message});
 	}
 	await session.endSession();
 });
@@ -86,8 +83,7 @@ router.put('/modifyWriting', async (req, res) => {
 		
 		res.status(200).json({success: true});
 	}catch (err) {
-		res.status(500).json({success: false, err});
-		console.log(err);
+		res.status(500).json({success: false, message : err.message});
 	}
 });
 
@@ -110,8 +106,7 @@ router.delete('/deleteWriting', async (req, res) => {
 		res.status(200).json({success: true});
 	}catch (err) {
 		await session.abortTransaction();
-		res.status(500).json({success: false, err});
-		console.log(err);
+		res.status(500).json({success: false, message : err.message});
 	}
 	await session.endSession();
 });
