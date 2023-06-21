@@ -27,4 +27,42 @@ router.post('/signup', async (req, res) => {
 	}
 });
 
+// 로그인을 위한 요청 처리, _id로 생성된 token 발급
+router.get('/login', async (req, res) => {
+	try{
+		const reader = await ReaderModel.findOne({ email: req.query.email })
+		console.log(req.query.email + " " + req.query.password)
+		if(reader){
+			  reader
+				.comparePassword(req.query.password)
+				.then((isMatch) => {
+				  if (!isMatch) {
+					return res.json({
+					  loginSuccess: false,
+					  err: "Invalid Password",
+					});
+				  }
+				  reader
+					.generateToken()
+					.then((reader) => {
+					  res
+						.status(200)
+						.json({ sucess: true, authorToken : reader.token }); // userId: user._id
+					})
+					.catch((err) => {
+					  res.status(400).send({sucess: false, message : err.message});
+					});
+				})
+				.catch((err) => res.json({ sucess: false, message : err.message }));
+			}else {
+			  res.status(400).send({sucess: false, err: "No Such Reader"});
+			}
+	}catch (err){
+		return res.status(500).json({
+			sucess: false,
+			message : err.message
+		});
+	 }
+});
+
 module.exports = router;
