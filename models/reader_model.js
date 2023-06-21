@@ -107,4 +107,4 @@ readerSchema.statics.getIdByToken = async (token) => {
 
 const ReaderModel = mongoose.model("ReaderModel", readerSchema);
 
-module.exports = { AuthorModel };
+module.exports = { ReaderModel };
