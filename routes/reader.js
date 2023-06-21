@@ -47,7 +47,7 @@ router.get('/login', async (req, res) => {
 					.then((reader) => {
 					  res
 						.status(200)
-						.json({ sucess: true, authorToken : reader.token }); // userId: user._id
+						.json({ sucess: true, readerToken : reader.token }); // userId: user._id
 					})
 					.catch((err) => {
 					  res.status(400).send({sucess: false, message : err.message});
@@ -63,6 +63,20 @@ router.get('/login', async (req, res) => {
 			message : err.message
 		});
 	 }
+});
+
+// 독자 삭제
+router.delete('/deleteReader', async (req, res) => {
+	try {
+		const readerID = await ReaderModel.getIdByToken(req.body.token);
+		if(!readerID)
+			throw new Error("No such Reader");
+		await ReaderModel.deleteOne({ _id : readerID });
+		
+		res.status(200).json({success: true});
+	}catch (err) {
+		res.status(500).json({success: false, message : err.message});
+	}
 });
 
 module.exports = router;
