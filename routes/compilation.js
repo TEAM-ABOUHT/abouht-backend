@@ -42,9 +42,12 @@ router.post('/addCompilation', async (req, res) => {
 				
 		const stat = await AuthorModel.findOneAndUpdate(
 			{ _id : authorID },
-			{ $push: { compilations : compilation._id } },
+			{ $addToSet: { compilations : compilation._id } },
 			{ session: session }
 		);
+		
+		if(!stat)
+			throw new Error("findOneAndUpdate err");
 		
 		await session.commitTransaction();
 		res.status(200).json({success: true});
@@ -63,17 +66,23 @@ router.put('/addWriting', async (req, res) => {
 		const writingID = req.body.writingID;
 		const compilationID = req.body.compilationID;
 		
-		await WritingModel.findOneAndUpdate(
+		let stat = await WritingModel.findOneAndUpdate(
 			{ _id : writingID },
 			{ $set: { compilationID : compilationID } },
 			{ session : session }
 		);
 		
-		await CompilationModel.findOneAndUpdate(
+		if(!stat)
+			throw new Error("findOneAndUpdate err");
+		
+		stat = await CompilationModel.findOneAndUpdate(
 			{ _id : compilationID },
-			{ $push: { writings : writingID } },
+			{ $addToSet: { writings : writingID } },
 			{ session : session }
 		);
+		
+		if(!stat)
+			throw new Error("findOneAndUpdate err");
 		
 		await session.commitTransaction();
 		res.status(200).json({success: true});
@@ -92,17 +101,23 @@ router.delete('/deleteWriting', async (req, res) => {
 		const writingID = req.body.writingID;
 		const compilationID = req.body.compilationID;
 
-		await WritingModel.findOneAndUpdate(
+		let stat = await WritingModel.findOneAndUpdate(
 			{ _id : writingID },
 			{ $set: { compilationID : "" } },
 			{ session : session }
 		);
 		
-		await CompilationModel.findOneAndUpdate(
+		if(!stat)
+			throw new Error("findOneAndUpdate err");
+		
+		stat = await CompilationModel.findOneAndUpdate(
 			{ _id : compilationID },
 			{ $pull: { writings : req.body.writingID } },
 			{ session : session }
 		);
+		
+		if(!stat)
+			throw new Error("findOneAndUpdate err");
 
 		await session.commitTransaction();
 		res.status(200).json({success: true});
@@ -123,11 +138,13 @@ router.delete('/deleteCompilation', async (req, res) => {
 		const authorID = await AuthorModel.getIdByToken(req.body.authorToken);
 		const writingIDs = compilation.writings;
 		
-		await AuthorModel.findOneAndUpdate(
+		const stat = await AuthorModel.findOneAndUpdate(
 			{ _id : authorID },
 			{ $pull : { compilations : req.body.compilationID } },
 			{ session: session }
 		);
+		if(!stat)
+			throw new Error("findOneAndUpdate err");
 		
 		for(var i = 0;i < writingIDs.length;i++){
 			await WritingModel.findOneAndUpdate(

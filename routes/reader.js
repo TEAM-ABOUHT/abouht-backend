@@ -79,4 +79,24 @@ router.delete('/deleteReader', async (req, res) => {
 	}
 });
 
+// 작가 구독, subAuthor Array에 _id 추가
+router.put('/subscribe', async (req, res) => {
+	try {
+		const readerID = await ReaderModel.getIdByToken(req.body.readerToken);
+		const authorToken = req.body.authorToken;
+		
+		const stat = await ReaderModel.findOneAndUpdate(
+			{ _id : readerID },
+			{ $addToSet: { subAuthors : authorToken } }
+		);
+		if(!stat)
+			throw new Error("findOneAndUpdate err");
+		
+		res.status(200).json({success: true});
+	}catch (err) {
+		res.status(500).json({success: false, message : err.message});
+	}
+});
+
+
 module.exports = router;

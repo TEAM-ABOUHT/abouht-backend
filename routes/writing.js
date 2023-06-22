@@ -56,7 +56,7 @@ router.post('/addWriting', async (req, res) => {
 				
 		const stat = await AuthorModel.findOneAndUpdate(
 			{ _id : authorID },
-			{ $push: { writings : writing._id } },
+			{ $addToSet: { writings : writing._id } },
 			{ session: session }
 		);
 		
