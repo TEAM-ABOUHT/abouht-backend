@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-// 장르 스키마, 거의 static하게 구성
+// 장르 스키마, static하게 구성
 const genreSchema = mongoose.Schema({
 	parentID: {				// 상위 장르 _id
 		type: String,
