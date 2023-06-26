@@ -1,4 +1,3 @@
-// author_model과 관련된 요청 처리, 독자 사용자와 라우터 분리
 var express = require('express');
 var router = express.Router();
 
@@ -10,6 +9,24 @@ const { ReaderModel } = require("../models/reader_model");
 router.get("/", (req, res) => {
   	res.status(200).send({message : "독자 사용자 관련 로직"});
 });
+
+// 독자 정보를 token으로 가져오는 요청 처리 (_id, password는 노출되지 않음)
+router.get('/getReader', async (req, res) => {
+	try{
+		const readerID = await ReaderModel.getIdByToken(req.query.token);
+		const reader = await ReaderModel.findOne({ _id: readerID }).lean();
+		
+		reader._id = undefined;
+		reader.password = undefined;
+		return res.status(200).send({reader});
+	}catch (err){
+		return res.status(500).json({
+			sucess: false,
+			message : err.message
+		});
+	 }
+});
+
 
 // 회원가입을 위한 요청 처리
 router.post('/signup', async (req, res) => {

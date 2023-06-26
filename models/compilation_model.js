@@ -20,6 +20,10 @@ const compilationSchema = mongoose.Schema({
 		type : Array,
 		default : [],
 	},
+	genreID: {				// 장르 아이디
+		type: String,
+		required: true
+	},
 	authorToken: {			// 작가 토큰
 		type: String,
 		required: true

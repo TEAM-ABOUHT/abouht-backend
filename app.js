@@ -12,7 +12,8 @@ var indexRouter = require('./routes/index');
 var authorRouter = require('./routes/author');
 var writingRouter = require('./routes/writing');
 var compilationRouter = require('./routes/compilation');
-var ReaderRouter = require('./routes/reader');
+var readerRouter = require('./routes/reader');
+var genreRouter = require('./routes/genre');
 
 var app = express();
 
@@ -32,7 +33,8 @@ app.use('/', indexRouter);
 app.use('/author', authorRouter);
 app.use('/writing', writingRouter);
 app.use('/compilation', compilationRouter);
-app.use('/reader', ReaderRouter);
+app.use('/reader', readerRouter);
+app.use('/genre', genreRouter);
 
 app.use(function(req, res, next) {
   var err = new Error('Not Found');
