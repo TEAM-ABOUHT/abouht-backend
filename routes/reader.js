@@ -98,5 +98,61 @@ router.put('/subscribe', async (req, res) => {
 	}
 });
 
+// 작가 구독 해제, subAuthor Array에 _id 삭제
+router.put('/unSubscribe', async (req, res) => {
+	try {
+		const readerID = await ReaderModel.getIdByToken(req.body.readerToken);
+		const authorToken = req.body.authorToken;
+		
+		const stat = await ReaderModel.findOneAndUpdate(
+			{ _id : readerID },
+			{ $pull: { subAuthors : authorToken } }
+		);
+		if(!stat)
+			throw new Error("findOneAndUpdate err");
+		
+		res.status(200).json({success: true});
+	}catch (err) {
+		res.status(500).json({success: false, message : err.message});
+	}
+});
+
+// 글 북마크, bookmarks Array에 _id 추가
+router.put('/addBookmark', async (req, res) => {
+	try {
+		const readerID = await ReaderModel.getIdByToken(req.body.readerToken);
+		const writingID = req.body.writingID;
+		
+		const stat = await ReaderModel.findOneAndUpdate(
+			{ _id : readerID },
+			{ $addToSet: { bookmarks : writingID } }
+		);
+		if(!stat)
+			throw new Error("findOneAndUpdate err");
+		
+		res.status(200).json({success: true});
+	}catch (err) {
+		res.status(500).json({success: false, message : err.message});
+	}
+});
+
+// 북마크 해제
+router.put('/deleteBookmark', async (req, res) => {
+	try {
+		const readerID = await ReaderModel.getIdByToken(req.body.readerToken);
+		const writingID = req.body.writingID;
+		
+		const stat = await ReaderModel.findOneAndUpdate(
+			{ _id : readerID },
+			{ $pull: { bookmarks : writingID } }
+		);
+		if(!stat)
+			throw new Error("findOneAndUpdate err");
+		
+		res.status(200).json({success: true});
+	}catch (err) {
+		res.status(500).json({success: false, message : err.message});
+	}
+});
 
 module.exports = router;
