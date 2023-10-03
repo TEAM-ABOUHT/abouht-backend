@@ -14,6 +14,7 @@ var writingRouter = require('./routes/writing');
 var compilationRouter = require('./routes/compilation');
 var readerRouter = require('./routes/reader');
 var genreRouter = require('./routes/genre');
+var authRouter = require('./routes/auth');
 
 var app = express();
 
@@ -35,6 +36,7 @@ app.use('/writing', writingRouter);
 app.use('/compilation', compilationRouter);
 app.use('/reader', readerRouter);
 app.use('/genre', genreRouter);
+app.use('/auth', authRouter);
 
 app.use(function(req, res, next) {
   var err = new Error('Not Found');
