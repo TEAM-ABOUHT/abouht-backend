@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 
 const mongoose = require('mongoose');
-const { GenreModel } = require('../models/genre_model');
+const { GenreModel } = require('../models/genre.model');
 
 router.get('/', (req, res) => {
   res.status(200).send({ message: '장르 관련 로직' });
