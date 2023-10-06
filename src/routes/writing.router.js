@@ -5,6 +5,7 @@ var router = express.Router();
 const mongoose = require('mongoose');
 const { WritingModel } = require('../models/writing.model');
 const { AuthorModel } = require('../models/author.model');
+const { checkAuth } = require('../middlewares/auth-cookie');
 
 router.get('/', (req, res) => {
   res.status(200).send({ message: '글 관련 로직' });
@@ -47,7 +48,7 @@ router.get('/getAuthorWritings', async (req, res) => {
 });
 
 // 글 작성, 작가 writings token 추가 로직
-router.post('/addWriting', async (req, res) => {
+router.post('/addWriting', checkAuth('author'), async (req, res) => {
   // 두개 이상의 collection에 접근하기 때문에 transaction 사용
   const session = await mongoose.startSession();
   await session.startTransaction();

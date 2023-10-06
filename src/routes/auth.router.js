@@ -1,5 +1,5 @@
 const { Router } = require('express');
-const { CheckAuth } = require('../middlewares/auth-cookie');
+const { checkAuth } = require('../middlewares/auth-cookie');
 const jsend = require('../middlewares/jsend.js');
 const { AccountModel } = require('../models/account.model');
 const router = Router();
@@ -114,15 +114,15 @@ router.put('/modify', async (req, res) => {
 
 // # COOKIE TOKEN TESTING ROUTES
 
-router.get('/reader', CheckAuth('reader'), (req, res) => {
+router.get('/reader', checkAuth('reader'), (req, res) => {
   res.status(200).json('good!!! ##!!');
 });
 
-router.get('/author', CheckAuth('author'), (req, res) => {
+router.get('/author', checkAuth('author'), (req, res) => {
   res.status(200).json('good!!! ##!!');
 });
 
-router.get('/admin', CheckAuth('admin'), (req, res) => {
+router.get('/admin', checkAuth('admin'), (req, res) => {
   res.status(200).json('good!!! ##!!');
 });
 

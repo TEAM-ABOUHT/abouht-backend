@@ -7,10 +7,8 @@ const compilationRouter = require('./compilation.router');
 const readerRouter = require('./reader.router');
 const genreRouter = require('./genre.router');
 const authRouter = require('./auth.router');
+const writeRouter = require('./write.router');
 
-router.get('/', function (req, res, next) {
-  res.render('index', { title: 'Abouht' });
-});
 router.get('/', async (req, res) => {
   const info = {
     userAgent: req.headers['user-agent'],
@@ -19,7 +17,7 @@ router.get('/', async (req, res) => {
     requestURL: req.url,
   };
   return res.send(
-    `<h1>Notice-Board</h1> 
+    `<h1>Abouht-Backend</h1> 
      <hr/>
      <h2>Connection Info</h2>
       <p><b>userAgent :</b> ${info.userAgent}</p>
@@ -31,10 +29,11 @@ router.get('/', async (req, res) => {
 });
 
 router.use('/author', authorRouter);
-router.use('/writing', writingRouter);
+router.use('/writing', writingRouter); // 글쓰기
 router.use('/compilation', compilationRouter);
-router.use('/reader', readerRouter);
+router.use('/reader', readerRouter); // 글읽기
 router.use('/genre', genreRouter);
 router.use('/auth', authRouter);
+router.use('/write', writeRouter);
 
 module.exports = router;
