@@ -5,15 +5,9 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 const cors = require('cors');
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
+const route = require('./routes');
 require('dotenv').config();
-
-var indexRouter = require('./routes/index');
-var authorRouter = require('./routes/author');
-var writingRouter = require('./routes/writing');
-var compilationRouter = require('./routes/compilation');
-var readerRouter = require('./routes/reader');
-var genreRouter = require('./routes/genre');
 
 var app = express();
 
@@ -25,25 +19,22 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(cors({
-    origin: '*'
-}));
+app.use(
+  cors({
+    origin: '*',
+  })
+);
 
-app.use('/', indexRouter);
-app.use('/author', authorRouter);
-app.use('/writing', writingRouter);
-app.use('/compilation', compilationRouter);
-app.use('/reader', readerRouter);
-app.use('/genre', genreRouter);
+app.use('/', route);
 
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   var err = new Error('Not Found');
   err.status = 404;
   next(err);
 });
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
@@ -54,16 +45,27 @@ app.use(function(err, req, res, next) {
 });
 
 var port = 3030;
-app.listen(process.env.PORT || port, () => console.log('Abouht Server is Listening : ' + port));
+app.listen(process.env.PORT || port, () =>
+  console.log('Abouht Server is Listening : ' + port)
+);
 
 // DB connection
-const dbAddress = "mongodb+srv://" + process.env.DB_USER + ":" + process.env.DB_PASS + "@" + process.env.DB_HOST;
+const dbAddress =
+  'mongodb+srv://' +
+  process.env.DB_USER +
+  ':' +
+  process.env.DB_PASS +
+  '@' +
+  process.env.DB_HOST;
 
-mongoose.connect(dbAddress, {
+mongoose
+  .connect(dbAddress, {
     // useNewUrlPaser: true,
     // useUnifiedTofology: true,
     // useCreateIndex: true,
     // useFindAndModify: false,
-}).then(() => console.log("MongoDB Connected")).catch((err) => console.log(err));
+  })
+  .then(() => console.log('MongoDB Connected'))
+  .catch((err) => console.log(err));
 
 module.exports = app;
