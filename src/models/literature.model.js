@@ -27,8 +27,9 @@ const literatureSchema = mongoose.Schema({
     type: Date,
     default: Date.now,
   },
-  authorEmail: {
-    // 작가 계정
+
+  authorId: {
+    // 작가 _id
     type: String,
     required: true,
   },
@@ -36,4 +37,4 @@ const literatureSchema = mongoose.Schema({
 
 const LiteratureModel = mongoose.model('LiteratureModel', literatureSchema);
 
-module.exports = { LiteratureModel };
+module.exports = LiteratureModel;

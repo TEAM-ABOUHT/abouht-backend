@@ -69,7 +69,11 @@ router.get('/login', async (req, res) => {
             return res.json(jsend.FAIL('Invalid ID or password'));
           }
           account
-            .generateToken({ email: account.email, type: account.type })
+            .generateToken({
+              email: account.email,
+              type: account.type,
+              id: account._id,
+            })
             .then((account) => {
               return res
                 .status(200)

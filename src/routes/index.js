@@ -8,6 +8,7 @@ const readerRouter = require('./reader.router');
 const genreRouter = require('./genre.router');
 const authRouter = require('./auth.router');
 const writeRouter = require('./write.router');
+const literatureRouter = require('./literature.router');
 
 router.get('/', async (req, res) => {
   const info = {
@@ -33,7 +34,9 @@ router.use('/writing', writingRouter); // 글쓰기
 router.use('/compilation', compilationRouter);
 router.use('/reader', readerRouter); // 글읽기
 router.use('/genre', genreRouter);
+
 router.use('/auth', authRouter);
 router.use('/write', writeRouter);
+router.use('/literature', literatureRouter);
 
 module.exports = router;

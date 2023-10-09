@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
 // 작가의 프로필을 구성하는 스키마
 const accountSchema = mongoose.Schema({
@@ -73,9 +74,9 @@ accountSchema.methods.comparePassword = function (plainPassword) {
     .catch((err) => err);
 };
 
-accountSchema.methods.generateToken = function ({ email, type }) {
-  console.log(`email : ${email}, type ${type}`);
-  const token = jwt.sign({ email, type }, 'secretToken', {
+accountSchema.methods.generateToken = function ({ email, type, id }) {
+  console.log(`email : ${email}, type ${type}, _id${id}`);
+  const token = jwt.sign({ email, type, id }, process.env.SECERT_KEY, {
     expiresIn: '3h',
     issuer: 'abouht',
   });
@@ -88,7 +89,7 @@ accountSchema.methods.generateToken = function ({ email, type }) {
 
 // jwt 토큰을 받아서 id로 반환함
 accountSchema.statics.getIdByToken = async (token) => {
-  return jwt.verify(token, 'secretToken', function (err, decoded) {
+  return jwt.verify(token, process.env.SECERT_KEY, function (err, decoded) {
     try {
       return decoded;
     } catch (err) {

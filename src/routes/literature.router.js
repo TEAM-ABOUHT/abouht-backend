@@ -3,34 +3,57 @@ const express = require('express');
 const router = express.Router();
 
 const jsend = require('../middlewares/jsend');
-
+require('dotenv').config();
 const mongoose = require('mongoose');
 const LiteratureModel = require('../models/literature.model');
 const { checkAuth } = require('../middlewares/auth-cookie');
 
 router.get('/', (req, res) => {
-  res.status(200).json(jsend.SUCCESS('글쓰기 기능'));
+  res.status(200).json(jsend.SUCCESS('글 읽기 쓰기 기능'));
+});
+
+router.get('/read/:id', (req, res) => {
+  // 미들웨어로 사용자 읽기 권한 검증 로직 필요
+  const { id } = req.params;
+  const { title } = req.query;
+});
+
+router.get('/list', async (req, res) => {
+  const literaturesList = await LiteratureModel.find({});
+  return res
+    .status(200)
+    .json(jsend.SUCCESS('literatures list get success', literaturesList));
+});
+
+router.get('/:id', (req, res) => {
+  const { id } = req.params;
+  const { size } = req.query || 10;
+  if (!id) res.status(400).json(jsend.ERROR('id querystring does not exist.'));
+  try {
+  } catch (err) {}
 });
 
 router.post('/add', checkAuth('author'), async (req, res) => {
   // 토큰 사용자가 검증이 된 경우에 이 라우터가 실행됨.
-  const { email, id } = req.data;
+  const { id } = req.data;
   const { title, content } = req.body;
 
   const session = await mongoose.startSession();
   await session.startTransaction();
+
   try {
-    const literature = new LiteratureModel({ title, content, email });
+    const literature = new LiteratureModel({ title, content, id });
+
     if (
-      LiteratureModel.find({
+      !(await LiteratureModel.find({
         title,
-        email,
-      }).exist(false)
+        id,
+      }).get())
     ) {
-      literature.save({ session });
+      await literature.save({ session });
     } else {
       await session.abortTransaction();
-      res
+      return res
         .status(403)
         .json(
           jsend.FAIL(
@@ -39,11 +62,10 @@ router.post('/add', checkAuth('author'), async (req, res) => {
         );
     }
     await session.commitTransaction();
-    res.status(200).json(jsend.SUCCESS('해당 문학 생성 및 배포 완료'));
+    return res.status(200).json(jsend.SUCCESS('해당 문학 생성 및 배포 완료'));
   } catch (err) {
     await session.abortTransaction();
-    console.log('ERROR ', err);
-    res.status(500).json(jsend.ERROR(err));
+    return res.status(500).json(jsend.ERROR('error'));
   }
   await session.endSession();
 });
