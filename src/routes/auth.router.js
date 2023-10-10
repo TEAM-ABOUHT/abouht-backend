@@ -57,7 +57,7 @@ router.post('/signup', async (req, res) => {
 router.get('/login', async (req, res) => {
   try {
     if (!regEmail.test(req.query.email) && regPass.test(req.query.password))
-      res
+      return res
         .status(400)
         .json(jsend.ERROR('Information that does not comply with input rules'));
     const account = await AccountModel.findOne({ email: req.query.email });
@@ -87,7 +87,7 @@ router.get('/login', async (req, res) => {
         })
         .catch((err) => res.json(jsend.ERROR(err.message)));
     } else {
-      res.status(400).send(jsend.ERROR('No Such Account'));
+      return res.status(400).send(jsend.ERROR('No Such Account'));
     }
   } catch (err) {
     return res.status(500).json(jsend.ERROR(err.message));

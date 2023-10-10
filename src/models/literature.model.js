@@ -17,6 +17,11 @@ const literatureSchema = mongoose.Schema({
     type: String,
     required: true,
   },
+  authorId: {
+    // 작가 _id
+    type: String,
+    required: true,
+  },
   createDate: {
     // 생성 날짜
     type: Date,
@@ -26,12 +31,6 @@ const literatureSchema = mongoose.Schema({
     // 마지막 업데이트 날짜
     type: Date,
     default: Date.now,
-  },
-
-  authorId: {
-    // 작가 _id
-    type: String,
-    required: true,
   },
 });
 
