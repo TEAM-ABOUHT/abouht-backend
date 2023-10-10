@@ -48,4 +48,10 @@ router.post('/add', checkAuth('author'), async (req, res) => {
   await session.endSession();
 });
 
+router.get('/clear', async (req, res) => {
+  console.log('### DB Clear ###');
+  await LiteratureModel.deleteMany({});
+  res.status(200).json(jsend.SUCCESS('done!'));
+});
+
 module.exports = router;
