@@ -21,7 +21,8 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(
   cors({
-    origin: '*',
+    origin: '*', // axios cors 정책 땜에 이부분 프론트 엔드 도메인으로 변경하셔야 됩니다!!
+    credentials: true,
   })
 );
 

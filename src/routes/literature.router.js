@@ -72,6 +72,8 @@ router.post('/add', checkAuth('author'), async (req, res) => {
     return res.status(200).json(jsend.SUCCESS('해당 문학 생성 및 배포 완료'));
   } catch (err) {
     await session.abortTransaction();
+    console.log(err);
+
     return res.status(500).json(jsend.ERROR(err));
   }
   await session.endSession();

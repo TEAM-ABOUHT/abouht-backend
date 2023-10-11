@@ -75,6 +75,7 @@ router.get('/login', async (req, res) => {
               id: account._id,
             })
             .then((account) => {
+              res.cookie('token', account.token);
               return res
                 .status(200)
                 .json(
