@@ -1,5 +1,5 @@
 const { Router } = require('express');
-const { CheckAuth } = require('../middlewares/auth-cookie');
+const { checkAuth } = require('../middlewares/auth-cookie');
 const jsend = require('../middlewares/jsend.js');
 const { AccountModel } = require('../models/account.model');
 const router = Router();
@@ -57,7 +57,7 @@ router.post('/signup', async (req, res) => {
 router.get('/login', async (req, res) => {
   try {
     if (!regEmail.test(req.query.email) && regPass.test(req.query.password))
-      res
+      return res
         .status(400)
         .json(jsend.ERROR('Information that does not comply with input rules'));
     const account = await AccountModel.findOne({ email: req.query.email });
@@ -69,8 +69,13 @@ router.get('/login', async (req, res) => {
             return res.json(jsend.FAIL('Invalid ID or password'));
           }
           account
-            .generateToken({ email: account.email, type: account.type })
+            .generateToken({
+              email: account.email,
+              type: account.type,
+              id: account._id,
+            })
             .then((account) => {
+              res.cookie('token', account.token);
               return res
                 .status(200)
                 .json(
@@ -83,7 +88,7 @@ router.get('/login', async (req, res) => {
         })
         .catch((err) => res.json(jsend.ERROR(err.message)));
     } else {
-      res.status(400).send(jsend.ERROR('No Such Account'));
+      return res.status(400).send(jsend.ERROR('No Such Account'));
     }
   } catch (err) {
     return res.status(500).json(jsend.ERROR(err.message));
@@ -114,15 +119,15 @@ router.put('/modify', async (req, res) => {
 
 // # COOKIE TOKEN TESTING ROUTES
 
-router.get('/reader', CheckAuth('reader'), (req, res) => {
+router.get('/reader', checkAuth('reader'), (req, res) => {
   res.status(200).json('good!!! ##!!');
 });
 
-router.get('/author', CheckAuth('author'), (req, res) => {
+router.get('/author', checkAuth('author'), (req, res) => {
   res.status(200).json('good!!! ##!!');
 });
 
-router.get('/admin', CheckAuth('admin'), (req, res) => {
+router.get('/admin', checkAuth('admin'), (req, res) => {
   res.status(200).json('good!!! ##!!');
 });
 
